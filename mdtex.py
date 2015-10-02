@@ -5,24 +5,37 @@ import tempfile
 import argparse
 import subprocess
 
+def shell_call(cmd, inputStr, tempdir):
+  tmpfnin = os.path.join(tempdir, 'in')
+  tmpfnout = os.path.join(tempdir, 'out')
+  ftemp = io.open(tmpfnin, 'wt')
+  ftemp.write(inputStr)
+  ftemp.close()
+  tempin = io.open(tmpfnin, 'rt')
+  tempout = io.open(tmpfnout, 'wt')
+  subprocess.call(cmd, stdin=tempin, stdout=tempout)
+  tempin.close()
+  tempout.close()
+  ftemp = io.open(tmpfnout, 'rt')
+  outputStr = ftemp.read();
+  ftemp.close()
+  return outputStr.encode('ascii', 'replace')
+
 def tex_to_png(tex, tempdir, idx, imgdir):
   if len(tex) < 1: return ''
   tex2png = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tex2png')
+  imgname = imgdir + str(idx) + '.png'
   multiline = False
   if tex[0] == '\n' or tex[0] == '\r': multiline = True
-  tmpfname = os.path.join(tempdir, str(idx))
-  ftemp = io.open(tmpfname, 'wt')
-  ftemp.write(u'\\[' if multiline else u'$')
-  ftemp.write(tex)
-  ftemp.write(u'\\]' if multiline else u'$')
-  ftemp.close()
-  ftemp = io.open(tmpfname, 'rt');
-  imgname = imgdir + str(idx) + '.png'
-  subprocess.call([tex2png, '-i', '-T', '-o', imgname], stdin=ftemp)
-  ftemp.close()
+  inputStr = (u'\\[' if multiline else u'$') + tex + (u'\\]' if multiline else u'$')
+  outputStr = shell_call([tex2png, '-i', '-T', '-o', imgname], inputStr, tempdir)
+  height = 0
+  for m in re.finditer(r'=[0-9]+', outputStr):
+    height = height + int(outputStr[m.start()+1:m.end()])
+  height = '" style="height:%.1fem;">' % (float(height)/30)
   html = r'<!-- ' + tex + ' -->';
   html = html + ('<p>' if multiline else '<span>');
-  html = html + '<img src="' + imgname + '">'
+  html = html + '<img src="' + imgname + height
   html = html + ('</p>' if multiline else '</span>');
   return html
   
