@@ -146,6 +146,7 @@ if [[ -z $full ]]; then
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
 \usepackage{amssymb}
+\usepackage{amsmath}
 ${_preview}
 \begin{document}
 \begin{samepage}
@@ -159,7 +160,6 @@ $content
 TEX
 fi
 
-#\usepackage{amsmath}
 LC_ALL=C latex -halt-on-error -output-directory="$tmpdir" "$tmpdir/content.tex" >/dev/null  || exit 1
 while [[ ! -e $tmpdir/content.dvi ]] || [[ ! -s $tmpdir/content.dvi ]]; do
   if [[ -e $tmpdir/content.log ]] \

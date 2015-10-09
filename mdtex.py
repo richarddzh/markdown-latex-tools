@@ -35,7 +35,7 @@ def tex_to_png(tex, tempdir, idx, imgdir):
   height = '" style="height:%.1fem;">' % (float(height)/30)
   html = r'<!-- ' + tex + ' -->';
   html = html + ('<p>' if multiline else '<span>');
-  html = html + '<img src="' + imgname + height
+  html = html + '<img src="' + imgname + '">'
   html = html + ('</p>' if multiline else '</span>');
   return html
   
