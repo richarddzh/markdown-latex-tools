@@ -11,6 +11,10 @@ comment
 |--|--|
 |pp|pp|
 |pp|pp|
+<!--equ-->$$
+x = \sqrt{y}
++ z
+$$
 
 this is end
 

@@ -10,6 +10,7 @@ class State:
   TEXT = 0
   TABLE = 1
   COMMENT = 2
+  EQUATION = 3
 
 class Parser:
   def __init__(self):
@@ -20,6 +21,12 @@ class Parser:
     self._table_cell = re.compile(r'\s*\|\s*([^\|]*)')
     self._table_line = re.compile(r'^(\s*\|)+\s*-((\s|-)*\|)+\s*$')
     self._comment = re.compile(r'<!--.*?(?=-->)-->')
+    self._equation = re.compile(r'^\s*\$\$\s*$')
+    self._newline = re.compile(r'\n\r?')
+
+  def parse(self, text):
+    for line in self._newline.split(text):
+      self.parse_line(line)
 
   def parse_line(self, line):
     line = line.rstrip('\n\r')
@@ -28,6 +35,7 @@ class Parser:
     self.parse_line_commentless(line)
 
   def parse_line_commentless(self, line):
+    if self.try_equation(line): return
     if self.try_title(line): return
     if self.try_image(line): return
     if self.try_table(line): return
@@ -35,10 +43,14 @@ class Parser:
 
   def set_state(self, s):
     if s == self.state: return
-    if s == State.TABLE:
-      self.handler.on_begin_table()
     if self.state == State.TABLE:
       self.handler.on_end_table()
+    if self.state == State.EQUATION:
+      self.handler.on_end_equation()
+    if s == State.TABLE:
+      self.handler.on_begin_table()
+    if s == State.EQUATION:
+      self.handler.on_begin_equation()
     self.state = s
 
   def parse_text(self, text):
@@ -97,4 +109,16 @@ class Parser:
       self.handler.on_table_row(m)
     else:
       self.handler.on_table_line()
+    return True
+
+  def try_equation(self, line):
+    m = self._equation.match(line)
+    if self.state == State.EQUATION and m is None:
+      self.handler.on_equation(line)
+    elif self.state == State.EQUATION:
+      self.set_state(State.TEXT)
+    elif m is None:
+      return False
+    else:
+      self.set_state(State.EQUATION)
     return True

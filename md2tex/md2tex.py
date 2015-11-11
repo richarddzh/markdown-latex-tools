@@ -32,6 +32,15 @@ class Handler:
   def on_table_row(self, row):
     print('table row: ' + str(row))
 
+  def on_begin_equation(self):
+    print('begin equation')
+
+  def on_end_equation(self):
+    print('end equation')
+
+  def on_equation(self, equ):
+    print('equation: ' + equ)
+
 p = markdown.Parser()
 p.handler = Handler()
 for line in fileinput.input():
