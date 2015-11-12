@@ -11,10 +11,18 @@ comment
 |--|--|
 |pp|pp|
 |pp|pp|
+ 1. item one
+ *  item two
+   - sub item
+   + add item
+     * sub sub item
+ 3. item three
 <!--equ-->$$
 x = \sqrt{y}
 + z
 $$
+1. item
+this is going on
+2. item
 
-this is end
-
+this is the end

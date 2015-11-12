@@ -41,6 +41,15 @@ class Handler:
   def on_equation(self, equ):
     print('equation: ' + equ)
 
+  def on_begin_list(self, sym):
+    print('begin list: ' + sym)
+
+  def on_end_list(self, sym):
+    print('end list: ' + sym)
+
+  def on_list_item(self, sym):
+    print('list item: ' + sym)
+
 p = markdown.Parser()
 p.handler = Handler()
 for line in fileinput.input():

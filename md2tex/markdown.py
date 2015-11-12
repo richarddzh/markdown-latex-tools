@@ -14,7 +14,8 @@ class State:
 
 class Parser:
   def __init__(self):
-    self.state = State.TEXT
+    self._state = State.TEXT
+    self._list_stack = list()
     self._title = re.compile(r'^\s*(#+)\s*(.+)$')
     self._image = re.compile(r'^\s*!\[([^\]]*)\]\(([^\)]+)\)\s*$')
     self._table = re.compile(r'^\s*\|([^\|]+\|)+\s*$')
@@ -22,6 +23,7 @@ class Parser:
     self._table_line = re.compile(r'^(\s*\|)+\s*-((\s|-)*\|)+\s*$')
     self._comment = re.compile(r'<!--.*?(?=-->)-->')
     self._equation = re.compile(r'^\s*\$\$\s*$')
+    self._list = re.compile(r'^(\s*)([0-9]+\.|-|\+|\*)\s+(.+)$')
     self._newline = re.compile(r'\n\r?')
 
   def parse(self, text):
@@ -39,19 +41,20 @@ class Parser:
     if self.try_title(line): return
     if self.try_image(line): return
     if self.try_table(line): return
+    if self.try_list(line): return
     self.parse_text(line)
 
   def set_state(self, s):
-    if s == self.state: return
-    if self.state == State.TABLE:
+    if s == self._state: return
+    if self._state == State.TABLE:
       self.handler.on_end_table()
-    if self.state == State.EQUATION:
+    if self._state == State.EQUATION:
       self.handler.on_end_equation()
     if s == State.TABLE:
       self.handler.on_begin_table()
     if s == State.EQUATION:
       self.handler.on_begin_equation()
-    self.state = s
+    self._state = s
 
   def parse_text(self, text):
     self.set_state(State.TEXT)
@@ -60,10 +63,10 @@ class Parser:
   def try_comment(self, line):
     if '<!--' not in line: return False
     m = self._comment.split(line)
-    pos = m[len(m) - 1].find('<!--')
+    pos = m[-1].find('<!--')
     if pos >= 0:
-      last_comment = m[len(m) - 1][pos:]
-      m[len(m) - 1] = m[len(m) - 1][0:pos]
+      last_comment = m[-1][pos:]
+      m[-1] = m[-1][0:pos]
     t = ''.join(m)
     if len(t) > 0 and (not t.isspace()): self.parse_line_commentless(t)
     for c in self._comment.findall(line):
@@ -74,7 +77,7 @@ class Parser:
     return True
 
   def try_end_comment(self, line):
-    if self.state != State.COMMENT: return False
+    if self._state != State.COMMENT: return False
     pos = line.find('-->')
     if pos < 0:
       self.handler.on_comment(line)
@@ -105,7 +108,7 @@ class Parser:
     m = self._table_line.match(line)
     if m is None:
       m = self._table_cell.findall(line)
-      del m[len(m) - 1]
+      m.pop()
       self.handler.on_table_row(m)
     else:
       self.handler.on_table_line()
@@ -113,12 +116,35 @@ class Parser:
 
   def try_equation(self, line):
     m = self._equation.match(line)
-    if self.state == State.EQUATION and m is None:
+    if self._state == State.EQUATION and m is None:
       self.handler.on_equation(line)
-    elif self.state == State.EQUATION:
+    elif self._state == State.EQUATION:
       self.set_state(State.TEXT)
     elif m is None:
       return False
     else:
       self.set_state(State.EQUATION)
     return True
+
+  def try_list(self, line):
+    if line.isspace() or len(line) == 0:
+      while self._list_stack:
+        self.handler.on_end_list(self._list_stack[-1][0])
+        self._list_stack.pop()
+      return False
+    m = self._list.match(line)
+    if m is None: return False
+    self.set_state(State.TEXT)
+    symbol = m.group(2)
+    depth = len(m.group(1))
+    text = m.group(3)
+    while self._list_stack and self._list_stack[-1][1] > depth:
+      self.handler.on_end_list(self._list_stack[-1][0])
+      self._list_stack.pop()
+    if (not self._list_stack) or self._list_stack[-1][1] < depth:
+      self._list_stack.append((symbol, depth))
+      self.handler.on_begin_list(symbol)
+    self.handler.on_list_item(symbol)
+    self.parse_text(text)
+    return True
+
