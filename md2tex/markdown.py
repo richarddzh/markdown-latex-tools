@@ -1,7 +1,7 @@
 '''
 markdown.py
   - author: Richard Dong
-  - description: A very simple markdown parser
+  - description: A very simple markdown parser with limited support
 '''
 
 import re
