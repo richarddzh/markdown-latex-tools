@@ -33,6 +33,8 @@ this is going on
 2. item
 
 this is the end
+* [chapter 1](chapter1.md)
+
 <!-- latex
 \end{document}
 -->

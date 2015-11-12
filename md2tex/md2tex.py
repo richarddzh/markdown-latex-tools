@@ -105,6 +105,9 @@ class Handler:
   def on_list_item(self, sym):
     print('\\item ', end='')
 
+  def on_include(self, file):
+    print('\\input{%s.tex}' % file)
+
 p = markdown.Parser()
 p.handler = Handler()
 for line in fileinput.input():
