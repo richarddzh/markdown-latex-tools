@@ -5,7 +5,9 @@ md2tex.py
 '''
 from __future__ import print_function
 import re
-import fileinput
+import io
+import sys
+import argparse
 import markdown
 
 class State:
@@ -109,7 +111,31 @@ class Handler:
   def on_list_item(self, sym):
     print('\\item ', end='')
 
-p = markdown.Parser()
-p.handler = Handler()
-for line in fileinput.input():
-  p.parse_line(line)
+  def on_include(self, filename):
+    print('\\input{%s.tex}' % filename)
+
+
+
+parser = argparse.ArgumentParser(description='Convert markdown to latex.')
+parser.add_argument('-c', dest='encoding', help='file encoding', default='utf8')
+parser.add_argument('-o', dest='output', help='output file')
+parser.add_argument('file', nargs='*', help='input files')
+args = parser.parse_args()
+
+if args.output is not None:
+  sys.stdout = io.open(args.output, mode='wt', encoding=args.encoding)
+
+for f in args.file:
+  p = markdown.Parser()
+  p.handler = Handler()
+  with io.open(f, mode='rt', encoding=args.encoding) as fi:
+    for line in fi:
+      p.parse_line(line)
+    p.parse_line('')
+
+if not args.file:
+  p = markdown.Parser()
+  p.handler = Handler()
+  for line in sys.stdin:
+    p.parse_line(line)
+  p.parse_line('')

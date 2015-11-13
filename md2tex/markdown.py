@@ -24,11 +24,13 @@ class Parser:
     self._comment = re.compile(r'<!--.*?(?=-->)-->')
     self._equation = re.compile(r'^\s*\$\$\s*$')
     self._list = re.compile(r'^(\s*)([0-9]+\.|-|\+|\*)\s+(.+)$')
+    self._include = re.compile(r'^\s*\*\s*\[([^\]]*)\]\(([^\)]+)\.md\)\s*$')
     self._newline = re.compile(r'\n\r?')
 
   def parse(self, text):
     for line in self._newline.split(text):
       self.parse_line(line)
+    self.parse_line('')
 
   def parse_line(self, line):
     line = line.rstrip('\n\r')
@@ -37,6 +39,7 @@ class Parser:
     self.parse_line_commentless(line)
 
   def parse_line_commentless(self, line):
+    if self.try_include(line): return
     if self.try_equation(line): return
     if self.try_title(line): return
     if self.try_image(line): return
@@ -149,3 +152,8 @@ class Parser:
     self.parse_text(text)
     return True
 
+  def try_include(self, line):
+    m = self._include.match(line)
+    if m is None: return False
+    self.handler.on_include(m.group(2))
+    return True
