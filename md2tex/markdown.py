@@ -84,7 +84,8 @@ class Parser:
     else:
       self.handler.on_comment(line[:pos + 3])
       self.set_state(State.TEXT)
-      self.parse_line(line[pos + 3:])
+      t = line[pos + 3:]
+      if len(t) > 0 and (not t.isspace()): self.parse_line(t)
     return True
 
   def try_title(self, line):

@@ -21,6 +21,7 @@ class Handler:
     self._var_pair = re.compile(r'(\w+)="([^"]+)"')
     self._escape = re.compile(r'(&|%|\$|_|\{|\})')
     self._inline_math = re.compile(r'\$\$(.+?)\$\$')
+    self._cite = re.compile(r'\[(cite|ref)@\s*([A-Za-z0-9:]+(\s*,\s*[A-Za-z0-9:]+)*)\]')
 
   def convert_text(self, text):
     m = self._inline_math.split(text)
@@ -29,6 +30,7 @@ class Handler:
       if i % 2 == 0:
         text = self._escape.sub(r'\\\1', m[i])
         text = text.replace(r'\\', r'\textbackslash{}')
+        text = self._cite.sub(r'\\\1{\2}', text)
       else:
         text = '$' + m[i] + '$'
       s = s + text
