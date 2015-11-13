@@ -41,10 +41,10 @@ class Handler:
     return s
 
   def on_begin_table(self):
-    caption = self.convert_text(self.vars.get('caption', ''))
-    print('\\begin{table}[%s]' % self.vars.get('float', '!h'))
-    print('\\caption{%s}\\label{%s}' % (caption, self.vars.get('label', 'tab:nolabel')))
-    print('\\centering\\begin{tabular}{%s}\\hline' % self.vars.get('columns', 'c'))
+    caption = self.convert_text(self.vars.pop('caption', ''))
+    print('\\begin{table}[%s]' % self.vars.pop('float', '!h'))
+    print('\\caption{%s}\\label{%s}' % (caption, self.vars.pop('label', 'tab:nolabel')))
+    print('\\centering\\begin{tabular}{%s}\\hline' % self.vars.pop('columns', 'c'))
 
   def on_end_table(self):
     print('\\hline\\end{tabular}')
@@ -75,9 +75,9 @@ class Handler:
   def on_image(self, **arg):
     url = arg['url']
     caption = self.convert_text(arg['caption'])
-    print('\\begin{figure}[%s]' % self.vars.get('float', '!h'))
-    print('\\centering\\includegraphics[width=%s\\linewidth]{%s}' % (self.vars.get('width', '0.5'), url))
-    print('\\caption{%s}\\label{%s}' % (caption, self.vars.get('label', 'fig:nolabel')))
+    print('\\begin{figure}[%s]' % self.vars.pop('float', '!h'))
+    print('\\centering\\includegraphics[width=%s\\linewidth]{%s}' % (self.vars.pop('width', '0.5'), url))
+    print('\\caption{%s}\\label{%s}' % (caption, self.vars.pop('label', 'fig:nolabel')))
     print('\\end{figure}')
 
   def on_table_line(self):
@@ -88,7 +88,7 @@ class Handler:
     print(' & '.join(row) + ' \\\\')
 
   def on_begin_equation(self):
-    print('\\begin{equation}\\label{%s}' % self.vars.get('label', 'equ:nolabel'))
+    print('\\begin{equation}\\label{%s}' % self.vars.pop('label', 'equ:nolabel'))
 
   def on_end_equation(self):
     print('\\end{equation}')
