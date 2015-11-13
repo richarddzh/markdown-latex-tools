@@ -30,6 +30,7 @@ class Parser:
   def parse(self, text):
     for line in self._newline.split(text):
       self.parse_line(line)
+    self.parse_line('')
 
   def parse_line(self, line):
     line = line.rstrip('\n\r')
@@ -38,6 +39,7 @@ class Parser:
     self.parse_line_commentless(line)
 
   def parse_line_commentless(self, line):
+    if self.try_include(line): return
     if self.try_equation(line): return
     if self.try_title(line): return
     if self.try_include(line): return
@@ -86,7 +88,8 @@ class Parser:
     else:
       self.handler.on_comment(line[:pos + 3])
       self.set_state(State.TEXT)
-      self.parse_line(line[pos + 3:])
+      t = line[pos + 3:]
+      if len(t) > 0 and (not t.isspace()): self.parse_line(t)
     return True
 
   def try_title(self, line):

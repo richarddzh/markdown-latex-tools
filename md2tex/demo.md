@@ -30,7 +30,7 @@ $$
 
 1. item
 this is going on
-2. item
+2. item [cite@dong1986,zheng2015], [ref@fig:1,fig:2], [ref@tab:1]
 
 this is the end
 * [chapter 1](chapter1.md)

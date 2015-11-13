@@ -5,7 +5,9 @@ md2tex.py
 '''
 from __future__ import print_function
 import re
-import fileinput
+import io
+import sys
+import argparse
 import markdown
 
 class State:
@@ -21,24 +23,28 @@ class Handler:
     self._var_pair = re.compile(r'(\w+)="([^"]+)"')
     self._escape = re.compile(r'(&|%|\$|_|\{|\})')
     self._inline_math = re.compile(r'\$\$(.+?)\$\$')
+    self._cite = re.compile(r'\[(cite|ref)@\s*([A-Za-z0-9:]+(\s*,\s*[A-Za-z0-9:]+)*)\]')
 
   def convert_text(self, text):
+    if len(text) == 0 or text.isspace(): return ''
     m = self._inline_math.split(text)
     s = ''
     for i in range(len(m)):
+      if len(m[i]) == 0 or m[i].isspace(): continue
       if i % 2 == 0:
         text = self._escape.sub(r'\\\1', m[i])
         text = text.replace(r'\\', r'\textbackslash{}')
+        text = self._cite.sub(r'\\\1{\2}', text)
       else:
         text = '$' + m[i] + '$'
       s = s + text
     return s
 
   def on_begin_table(self):
-    caption = self.convert_text(self.vars.get('caption', ''))
-    print('\\begin{table}[%s]' % self.vars.get('float', '!h'))
-    print('\\caption{%s}\\label{%s}' % (caption, self.vars.get('label', 'tab:nolabel')))
-    print('\\centering\\begin{tabular}{%s}\\hline' % self.vars.get('columns', 'c'))
+    caption = self.convert_text(self.vars.pop('caption', ''))
+    print('\\begin{table}[%s]' % self.vars.pop('float', '!h'))
+    print('\\caption{%s}\\label{%s}' % (caption, self.vars.pop('label', 'tab:nolabel')))
+    print('\\centering\\begin{tabular}{%s}\\hline' % self.vars.pop('columns', 'c'))
 
   def on_end_table(self):
     print('\\hline\\end{tabular}')
@@ -69,9 +75,9 @@ class Handler:
   def on_image(self, **arg):
     url = arg['url']
     caption = self.convert_text(arg['caption'])
-    print('\\begin{figure}[%s]' % self.vars.get('float', '!h'))
-    print('\\centering\\includegraphics[width=%s\\linewidth]{%s}' % (self.vars.get('width', '0.5'), url))
-    print('\\caption{%s}\\label{%s}' % (caption, self.vars.get('label', 'fig:nolabel')))
+    print('\\begin{figure}[%s]' % self.vars.pop('float', '!h'))
+    print('\\centering\\includegraphics[width=%s\\linewidth]{%s}' % (self.vars.pop('width', '0.5'), url))
+    print('\\caption{%s}\\label{%s}' % (caption, self.vars.pop('label', 'fig:nolabel')))
     print('\\end{figure}')
 
   def on_table_line(self):
@@ -82,7 +88,7 @@ class Handler:
     print(' & '.join(row) + ' \\\\')
 
   def on_begin_equation(self):
-    print('\\begin{equation}\\label{%s}' % self.vars.get('label', 'equ:nolabel'))
+    print('\\begin{equation}\\label{%s}' % self.vars.pop('label', 'equ:nolabel'))
 
   def on_end_equation(self):
     print('\\end{equation}')
@@ -105,10 +111,29 @@ class Handler:
   def on_list_item(self, sym):
     print('\\item ', end='')
 
-  def on_include(self, file):
-    print('\\input{%s.tex}' % file)
+  def on_include(self, filename):
+    print('\\input{%s.tex}' % filename)
 
-p = markdown.Parser()
-p.handler = Handler()
-for line in fileinput.input():
-  p.parse_line(line)
+parser.add_argument('-c', dest='encoding', help='file encoding', default='utf8')
+parser.add_argument('-o', dest='output', help='output file')
+parser.add_argument('file', nargs='*', help='input files')
+args = parser.parse_args()
+
+if args.output is not None:
+  sys.stdout = io.open(args.output, mode='wt', encoding=args.encoding)
+
+for f in args.file:
+  p = markdown.Parser()
+  p.handler = Handler()
+  with io.open(f, mode='rt', encoding=args.encoding) as fi:
+    for line in fi:
+      p.parse_line(line)
+    p.parse_line('')
+
+if not args.file:
+  p = markdown.Parser()
+  p.handler = Handler()
+  for line in sys.stdin:
+    p.parse_line(line)
+  p.parse_line('')
+
