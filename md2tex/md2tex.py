@@ -24,9 +24,11 @@ class Handler:
     self._cite = re.compile(r'\[(cite|ref)@\s*([A-Za-z0-9:]+(\s*,\s*[A-Za-z0-9:]+)*)\]')
 
   def convert_text(self, text):
+    if len(text) == 0 or text.isspace(): return ''
     m = self._inline_math.split(text)
     s = ''
     for i in range(len(m)):
+      if len(m[i]) == 0 or m[i].isspace(): continue
       if i % 2 == 0:
         text = self._escape.sub(r'\\\1', m[i])
         text = text.replace(r'\\', r'\textbackslash{}')
