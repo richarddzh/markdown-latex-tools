@@ -114,6 +114,7 @@ class Handler:
   def on_include(self, filename):
     print('\\input{%s.tex}' % filename)
 
+parser = argparse.ArgumentParser(description='convert markdown to latex.')
 parser.add_argument('-c', dest='encoding', help='file encoding', default='utf8')
 parser.add_argument('-o', dest='output', help='output file')
 parser.add_argument('file', nargs='*', help='input files')
