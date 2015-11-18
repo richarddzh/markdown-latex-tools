@@ -1,6 +1,22 @@
 md2tex
 ======
 
+## Usage
+
+    md2tex.py [-h] [-c ENCODING] [-o OUTPUT] [file [file ...]]
+
+convert markdown to latex.
+
+positional arguments:
+ *  `file`         input files
+
+optional arguments:
+ *  `-h`, `--help`   show this help message and exit
+ *  `-c ENCODING`  file encoding
+ *  `-o OUTPUT`    output file
+
+## Description
+
 A python tool to convert markdown to latex.
 Require Python 3.
 I write all strings without u-decoration (Python 2).
