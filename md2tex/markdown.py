@@ -11,6 +11,7 @@ class State:
   TABLE = 1
   COMMENT = 2
   EQUATION = 3
+  CODE = 4
 
 class Parser:
   def __init__(self):
@@ -25,6 +26,7 @@ class Parser:
     self._equation = re.compile(r'^\s*\$\$\s*$')
     self._list = re.compile(r'^(\s*)([0-9]+\.|-|\+|\*)\s+(.+)$')
     self._include = re.compile(r'^\s*\*\s*\[([^\]]*)\]\(([^\)]+)\.md\)\s*$')
+    self._code = re.compile(r'^\s*```(\S*)\s*$')
     self._newline = re.compile(r'\n\r?')
 
   def parse(self, text):
@@ -41,6 +43,7 @@ class Parser:
   def parse_line_commentless(self, line):
     if self.try_include(line): return
     if self.try_equation(line): return
+    if self.try_code(line): return
     if self.try_title(line): return
     if self.try_include(line): return
     if self.try_image(line): return
@@ -54,6 +57,8 @@ class Parser:
       self.handler.on_end_table()
     if self._state == State.EQUATION:
       self.handler.on_end_equation()
+    if self._state == State.CODE:
+      self.handler.on_end_code()
     if s == State.TABLE:
       self.handler.on_begin_table()
     if s == State.EQUATION:
@@ -129,6 +134,19 @@ class Parser:
       return False
     else:
       self.set_state(State.EQUATION)
+    return True
+
+  def try_code(self, line):
+    m = self._code.match(line)
+    if self._state == State.CODE and m is None:
+      self.handler.on_code(line)
+    elif self._state == State.CODE:
+      self.set_state(State.TEXT)
+    elif m is None:
+      return False
+    else:
+      self.set_state(State.CODE)
+      self.handler.on_begin_code(m.group(1))
     return True
 
   def try_list(self, line):

@@ -39,6 +39,7 @@ The code does not work in Python 2.
  - list: numbered list and `*+-` list are both supported. Nested list is OK.
  - href: only `*[description](filename)` styled table-of-contents items are supported.
           This will generate `input` command in latex.
+ - code: fenced code block. This requires the `listings` latex package.
 
 ## Special extension for latex
 

@@ -28,6 +28,17 @@ x = \sqrt{y}
 + z
 $$
 
+```matlab
+function a = f(x)
+  a = x + 1
+end
+```
+
+this is code too:
+```
+\usepackage{listings}
+```
+
 1. item
 this is going on
 2. item [cite@dong1986,zheng2015], [ref@fig:1,fig:2], [ref@tab:1]

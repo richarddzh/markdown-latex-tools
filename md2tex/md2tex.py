@@ -114,6 +114,18 @@ class Handler:
   def on_include(self, filename):
     print('\\input{%s.tex}' % filename)
 
+  def on_begin_code(self, lang):
+    if (not lang) or lang.isspace():
+      print('\\begin{lstlisting}')
+    else:
+      print('\\begin{lstlisting}[language=%s]' % lang)
+
+  def on_end_code(self):
+    print('\\end{lstlisting}')
+
+  def on_code(self, code):
+    print(code)
+
 parser = argparse.ArgumentParser(description='convert markdown to latex.')
 parser.add_argument('-c', dest='encoding', help='file encoding', default='utf8')
 parser.add_argument('-o', dest='output', help='output file')
