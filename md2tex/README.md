@@ -45,11 +45,11 @@ The code does not work in Python 2.
 
  - inline latex: start with a single line `<!-- latex` and end with a single line `-->`.
  - attributes: set attributes used for latex `<!-- set name1="value1" name2="value2" -->`.
-   - `width`: for image, e.g. `width="0.5"` will generate `0.5\linewidth`. default: 0.5.
-   - `label`: for image, table and equation. default: nolabel.
-   - `float`: for image and table. default: ht.
-   - `caption`: for table. default: empty string.
-   - `columns`: for table, tabular columns specification. default: c.
+   - `width`: for images, e.g. `width="0.5"` will generate `0.5\linewidth`. default: 0.5.
+   - `label`: for images, tables and equations. default: nolabel.
+   - `float`: for images and tables. default: ht.
+   - `caption`: for tables and code listings. default: empty string.
+   - `columns`: for tables, tabular columns specification. default: c.
  - references: refer to citation, label.
    - `[ref@item1,item2]`: generate `\ref{item1,item2}`.
    - `[cite@item1,item2]`: generate `\cite{item1,item2}`.
