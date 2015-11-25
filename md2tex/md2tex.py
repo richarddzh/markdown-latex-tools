@@ -115,10 +115,16 @@ class Handler:
     print('\\input{%s.tex}' % filename)
 
   def on_begin_code(self, lang):
-    if (not lang) or lang.isspace():
-      print('\\begin{lstlisting}')
-    else:
-      print('\\begin{lstlisting}[language=%s]' % lang)
+    params = list()
+    if lang and not lang.isspace():
+      params.append('language=%s' % lang)
+    caption = self.convert_text(self.vars.pop('caption', ''))
+    if caption and not caption.isspace():
+      params.append('caption={%s}' % caption)
+    params = ','.join(params)
+    if params and not params.isspace():
+      params = '[' + params + ']'
+    print('\\begin{lstlisting}' + params)
 
   def on_end_code(self):
     print('\\end{lstlisting}')

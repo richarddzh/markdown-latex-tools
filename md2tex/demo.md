@@ -28,6 +28,7 @@ x = \sqrt{y}
 + z
 $$
 
+<!-- set caption="title of listing" -->
 ```matlab
 function a = f(x)
   a = x + 1
