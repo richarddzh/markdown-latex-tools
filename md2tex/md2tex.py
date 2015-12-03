@@ -40,10 +40,15 @@ class Handler:
       s = s + text
     return s
 
+  def print_label(self):
+    if 'label' in self.vars:
+      print('\\label{%s}' % self.vars.pop('label', 'nolabel'))
+
   def on_begin_table(self):
     caption = self.convert_text(self.vars.pop('caption', ''))
     print('\\begin{table}[%s]' % self.vars.pop('float', '!h'))
-    print('\\caption{%s}\\label{%s}' % (caption, self.vars.pop('label', 'tab:nolabel')))
+    print('\\caption{%s}' % caption)
+    self.print_label()
     print('\\centering\\begin{tabular}{%s}\\hline' % self.vars.pop('columns', 'c'))
 
   def on_end_table(self):
@@ -77,7 +82,8 @@ class Handler:
     caption = self.convert_text(arg['caption'])
     print('\\begin{figure}[%s]' % self.vars.pop('float', '!h'))
     print('\\centering\\includegraphics[width=%s\\linewidth]{%s}' % (self.vars.pop('width', '0.5'), url))
-    print('\\caption{%s}\\label{%s}' % (caption, self.vars.pop('label', 'fig:nolabel')))
+    print('\\caption{%s}' % caption)
+    self.print_label()
     print('\\end{figure}')
 
   def on_table_line(self):
@@ -88,7 +94,8 @@ class Handler:
     print(' & '.join(row) + ' \\\\')
 
   def on_begin_equation(self):
-    print('\\begin{equation}\\label{%s}' % self.vars.pop('label', 'equ:nolabel'))
+    print('\\begin{equation}')
+    self.print_label()
 
   def on_end_equation(self):
     print('\\end{equation}')
