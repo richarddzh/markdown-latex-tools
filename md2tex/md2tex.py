@@ -24,6 +24,7 @@ class Handler:
     self._escape = re.compile(r'(&|%|\$|_|\{|\})')
     self._inline_math = re.compile(r'\$\$(.+?)\$\$')
     self._cite = re.compile(r'\[(cite|ref)@\s*([A-Za-z0-9:]+(\s*,\s*[A-Za-z0-9:]+)*)\]')
+    self._bold = re.compile(r'\*\*(?!\s)(.+?)\*\*')
 
   def convert_text(self, text):
     if len(text) == 0 or text.isspace(): return ''
@@ -32,13 +33,30 @@ class Handler:
     for i in range(len(m)):
       if len(m[i]) == 0 or m[i].isspace(): continue
       if i % 2 == 0:
-        text = self._escape.sub(r'\\\1', m[i])
-        text = text.replace(r'\\', r'\textbackslash{}')
-        text = self._cite.sub(r'\\\1{\2}', text)
+        text = self.convert_text_no_math(m[i])
       else:
         text = '$' + m[i] + '$'
       s = s + text
     return s
+
+  def convert_text_no_math(self, text):
+    if len(text) == 0 or text.isspace(): return ''
+    m = self._bold.split(text)
+    s = ''
+    for i in range(len(m)):
+      if len(m[i]) == 0 or m[i].isspace(): continue
+      if i % 2 == 0:
+        text = self.convert_text_no_bold(m[i])
+      else:
+        text = '\\textbf{' + self.convert_text_no_bold(m[i]) + '}'
+      s = s + text
+    return s
+
+  def convert_text_no_bold(self, text):
+    text = self._escape.sub(r'\\\1', text)
+    text = text.replace(r'\\', r'\textbackslash{}')
+    text = self._cite.sub(r'\\\1{\2}', text)
+    return text
 
   def print_label(self):
     if 'label' in self.vars:

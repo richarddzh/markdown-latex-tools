@@ -42,7 +42,9 @@ this is code too:
 
 1. item
 this is going on
-2. item [cite@dong1986,zheng2015], [ref@fig:1,fig:2], [ref@tab:1]
+2. item **something bold** [cite@dong1986,zheng2015], [ref@fig:1,fig:2], [ref@tab:1]
+
+**bold things here** that is it
 
 this is the end
 * [chapter 1](chapter1.md)
