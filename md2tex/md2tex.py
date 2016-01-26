@@ -62,9 +62,15 @@ class Handler:
     if 'label' in self.vars:
       print('\\label{%s}' % self.vars.pop('label', 'nolabel'))
 
+  def get_float_style(self):
+    fl = self.vars.pop('float', '!ht')
+    if fl == '!h' or fl == 'h!':
+      fl = '!ht'
+    return fl
+
   def on_begin_table(self):
     caption = self.convert_text(self.vars.pop('caption', ''))
-    print('\\begin{table}[%s]' % self.vars.pop('float', '!h'))
+    print('\\begin{table}[%s]' % self.get_float_style())
     print('\\caption{%s}' % caption)
     self.print_label()
     print('\\centering\\begin{tabular}{%s}\\hline' % self.vars.pop('columns', 'c'))
@@ -98,7 +104,7 @@ class Handler:
   def on_image(self, **arg):
     url = arg['url']
     caption = self.convert_text(arg['caption'])
-    print('\\begin{figure}[%s]' % self.vars.pop('float', '!h'))
+    print('\\begin{figure}[%s]' % self.get_float_style())
     print('\\centering\\includegraphics[width=%s\\linewidth]{%s}' % (self.vars.pop('width', '0.5'), url))
     print('\\caption{%s}' % caption)
     self.print_label()
