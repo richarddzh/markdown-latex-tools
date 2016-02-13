@@ -155,10 +155,19 @@ class Handler:
     params = ','.join(params)
     if params and not params.isspace():
       params = '[' + params + ']'
-    print('\\begin{lstlisting}' + params)
+    if lang == 'algorithm':
+      self.vars['lang'] = 'algorithm'
+      print('\\begin{algorithm}[%s]' % self.get_float_style())
+      print('\\caption{%s}' % caption)
+    else:
+      print('\\begin{lstlisting}' + params)
 
   def on_end_code(self):
-    print('\\end{lstlisting}')
+    lang = self.vars.pop('lang', '')
+    if lang == 'algorithm':
+      print('\\end{algorithm}')
+    else:
+      print('\\end{lstlisting}')
 
   def on_code(self, code):
     print(code)
