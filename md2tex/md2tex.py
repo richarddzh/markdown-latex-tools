@@ -159,6 +159,7 @@ class Handler:
       self.vars['lang'] = 'algorithm'
       print('\\begin{algorithm}[%s]' % self.get_float_style())
       print('\\caption{%s}' % caption)
+      print('\\SetKwProg{Fn}{Function}{}{end}')
     else:
       print('\\begin{lstlisting}' + params)
 
