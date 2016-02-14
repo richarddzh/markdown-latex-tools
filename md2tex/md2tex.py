@@ -161,7 +161,7 @@ class Handler:
       print('\\caption{%s}' % caption)
       self.print_label()
       print('\\setstretch{1.3}')
-      print('\\SetKwProg{Fn}{Function}{}{end}')
+      print('\\SetKwProg{Fn}{function}{}{end}')
     else:
       print('\\begin{lstlisting}' + params)
 
