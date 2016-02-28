@@ -18,7 +18,7 @@ class Parser:
     self._state = State.TEXT
     self._list_stack = list()
     self._title = re.compile(r'^\s*(#+)\s*(.+)$')
-    self._image = re.compile(r'^\s*!\[(.+)\]\(([^\)]+)\)\s*$')
+    self._image = re.compile(r'^\s*!\[(.*)\]\(([^\)]+)\)\s*$')
     self._table = re.compile(r'^\s*\|([^\|]+\|)+\s*$')
     self._table_cell = re.compile(r'\s*\|\s*([^\|]*)')
     self._table_line = re.compile(r'^(\s*\|)+\s*-((\s|-)*\|)+\s*$')
