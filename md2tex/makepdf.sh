@@ -10,4 +10,5 @@ xelatex SUMMARY.tex
 bibtex SUMMARY
 xelatex SUMMARY.tex
 xelatex SUMMARY.tex
+xelatex SUMMARY.tex
 
