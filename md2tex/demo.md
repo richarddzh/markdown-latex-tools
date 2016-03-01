@@ -7,6 +7,10 @@
 ## title 2
 ### title has $$\alpha$$
 
+<!-- set width="0.4" label="fig:a" style="subfloat" url="img.eps" -->
+![subfloat image](img.png)
+<!-- set width="0.6" label="fig:b" endline="\\" style="raw" -->
+![raw image](img.png)
 <!-- set float="ht" width="0.8" label="fig:1" -->
 ![caption has $](img.png)
 

@@ -104,11 +104,21 @@ class Handler:
   def on_image(self, **arg):
     url = arg['url']
     caption = self.convert_text(arg['caption'])
-    print('\\begin{figure}[%s]' % self.get_float_style())
-    print('\\centering\\includegraphics[width=%s\\linewidth]{%s}' % (self.vars.pop('width', '0.5'), url))
-    print('\\caption{%s}' % caption)
-    self.print_label()
-    print('\\end{figure}')
+    style = self.vars.pop('style', 'figure')
+    url = self.vars.pop('url', url)
+    width = self.vars.pop('width', '0.5')
+    endline = self.vars.pop('endline', '')
+    if style == 'figure':
+      print('\\begin{figure}[%s]' % self.get_float_style())
+      print('\\centering\\includegraphics[width=%s\\linewidth]{%s}\\caption{%s}' % (width, url, caption))
+      self.print_label()
+      print('\\end{figure}')
+    elif style == 'subfloat':
+      print('\\subfloat[%s]{\\includegraphics[width=%s\\linewidth]{%s}' % (caption, width, url))
+      self.print_label();
+      print('}%s' % endline)
+    elif style == 'raw':
+      print('\\includegraphics[width=%s\\linewidth]{%s}%s' % (width, url, endline))
 
   def on_table_line(self):
     print('\\hline')
